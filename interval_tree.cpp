@@ -68,36 +68,35 @@ void IntervalTree::insert(Node* root, Interval interval){
 
 Node* IntervalTree::deleteNode(Node* root, Interval interval){
     if (root == NULL)
-        return root;
+        return NULL;
     if (interval.low < root->intr.low)
         root->left = deleteNode(root->left, interval);
     else if (interval.low > root->intr.low)
         root->right = deleteNode(root->right, interval);
-    else{
-        Node *p = root->parent;
-        int maxleft = (root->left)->data;
-        int maxright = (root->right)->data;
-        if (root->left == NULL){
+    else if(interval.low == root->intr.low && interval.high == root->intr.high){
+			if(root->left==NULL){
+				Node *temp=root->right;
+				delete root;
+				return temp;
+			}
+			else if(root->right==NULL){
+				Node *temp=root->left;
+				delete root;
+				return temp;
+			}
             Node *temp = root->right;
-            p->data = max(p->data, temp->data);
-            return temp;
-        }
-        else if (root->right == NULL){
-            Node *temp = root->left;
-            p->data = max(p->data, temp->data);
-            return temp;
-        }
-        p->data = max(p->data, max((root->left)->data, (root->right)->data));
-        Node *temp = root->right;
-        while (temp->left != NULL)
-            temp = temp->left;
+            while(temp->left!=NULL)
+            {
+                temp = temp->left;
+            }
 
-        root->intr = temp->intr;
-        root->data =  max(maxleft, maxright);
-        root->right = deleteNode(root->right, temp->intr);
-    }
-    return root;
-}
+            root->intr = temp->intr;
+            root->data = temp->data;
+            root->right = deleteNode(root->right,temp->intr);
+		}
+		return root;
+   }
+
 
 Node* IntervalTree::searchInterval(Node *root, Interval interval){
         if (root == NULL){
@@ -133,7 +132,7 @@ int main(){
         intervalTree->insert(intervalTree->getRoot(), intervals[i]);
     }
 
-    cout<<"After insertion the inorder traversal of tree is -- \n";
+    cout<<"After insertion, the inorder traversal of tree is -- \n";
     inorder(intervalTree->getRoot());
 
 
@@ -155,6 +154,20 @@ int main(){
         cout << "No matching interval found! \n";
     else
         cout << "Overlaps with {" << result2->intr.low << "," << result2->intr.high << "} \n";
+
+
+
+    cout<<"\nAfter deleting node {17, 19} -- \n";
+
+    intervalTree->deleteNode(intervalTree->getRoot(), {17, 19});
+    inorder(intervalTree->getRoot());
+
+
+    cout<<"\nAfter deleting node {12, 15} -- \n";
+
+    intervalTree->deleteNode(intervalTree->getRoot(), {12, 15});
+    inorder(intervalTree->getRoot());
+
 
     return 0;
 }
