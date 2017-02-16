@@ -12,14 +12,6 @@ struct Node {
 };
 
 
-void inorder(Node *x) {
-	if (!x) return;
-    inorder(x->left);
-    cout<<"{" << x->intr.low<< " , "<<x->intr.high<<"}";
-    inorder(x->right);
-}
-
-
 class IntervalTree{
     private :
         Node *root;
@@ -30,6 +22,7 @@ class IntervalTree{
 		root->parent = NULL;
 		}
 
+        Node* getRoot(){return root;}
         Node* newNode(Interval interval);
         void insert(Node* root, Interval interval);
         Node* deleteNode(Node* root, Interval interval);
@@ -122,7 +115,46 @@ Node* IntervalTree::searchInterval(Node *root, Interval interval){
     }
 
 
+void inorder(Node *x) {
+	if (!x) return;
+    inorder(x->left);
+    cout<<"{" << x->intr.low<< " , "<<x->intr.high<<"} \n";
+    inorder(x->right);
+}
+
+
 int main(){
+    Interval intervals[] ={{15, 20}, {10, 30}, {17, 19},{5, 20}, {12, 15}, {30, 40}};
+    int size = sizeof(intervals) / sizeof(intervals[0]);
+
+    IntervalTree* intervalTree = new IntervalTree(intervals[0]);
+
+    for(int i=1; i<size; i++){
+        intervalTree->insert(intervalTree->getRoot(), intervals[i]);
+    }
+
+    cout<<"After insertion the inorder traversal of tree is -- \n";
+    inorder(intervalTree->getRoot());
 
 
+    Interval test1 = {14, 16};
+    cout<<"\nSearching for interval {"<<test1.low <<" , "<< test1.high <<"} ---\n";
+
+    Node *result1 = intervalTree->searchInterval(intervalTree->getRoot(), test1);
+    if (result1 == NULL)
+        cout << "No matching interval found\n";
+    else
+        cout << "Overlaps with {" << result1->intr.low << "," << result1->intr.high << "} \n";
+
+
+    Interval test2 = {21, 23};
+    cout<<"\nSearching for interval  {"<<test2.low <<" , "<< test2.high <<"}  ---\n";
+
+    Node *result2 = intervalTree->searchInterval(intervalTree->getRoot(), test2);
+    if (result2 == NULL)
+        cout << "No matching interval found! \n";
+    else
+        cout << "Overlaps with {" << result2->intr.low << "," << result2->intr.high << "} \n";
+
+    return 0;
 }
