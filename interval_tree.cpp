@@ -1,16 +1,21 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+struct Interval{
+	int low, high;
+};
+
 struct Node {
 	int data;
-	int highInterval, lowInterval;
+	Interval intr;
 	struct Node *left, *right, *parent;
 };
+
 
 void inorder(Node *x) {
 	if (!x) return;
     inorder(x->left);
-    cout<<"{" << x->lowInterval<< " , "<<x->highInterval<<"}";
+    cout<<"{" << x->intr.low<< " , "<<x->intr.high<<"}";
     inorder(x->right);
 }
 
@@ -20,47 +25,45 @@ class IntervalTree{
         Node *root;
 
 	public :
-        IntervalTree(int lowIntr, int highIntr){
-		root = newNode(lowIntr, highIntr);
+        IntervalTree(Interval interval){
+		root = newNode(interval);
 		root->parent = NULL;
 		}
 
-        Node* newNode(int lowIntr, int highIntr);
-        void insert(Node* root, int lowIntr, int highIntr);
-
+        Node* newNode(Interval interval);
+        void insert(Node* root, Interval interval);
 };
 
 
-Node* IntervalTree::newNode(int lowIntr, int highIntr){
+Node* IntervalTree::newNode(Interval interval){
     Node *node = new Node();
-    node->lowInterval = lowIntr;
-    node->highInterval = highIntr;
-    node->data = highIntr;
+    node->intr = interval;
+    node->data = interval.high;
     node->left = NULL;
     node->right = NULL;
     return node;
 }
 
-void IntervalTree::insert(Node* root, int lowIntr, int highIntr){
-    Node *newNode =  IntervalTree::newNode(lowIntr, highIntr);
+void IntervalTree::insert(Node* root, Interval interval){
+    Node *newNode =  IntervalTree::newNode(interval);
     if (!this->root){
         this->root = newNode;
         this->root->parent = NULL;
     }else{
         root->data = max(root->data, newNode->data);
-        if (newNode->lowInterval < root->lowInterval){
+        if (newNode->intr.low < root->intr.low ){
             if (!root->left){
                 root->left = newNode;
                 newNode->parent = root;
             }else{
-                insert(root->left, newNode->lowInterval, newNode->highInterval);
+                insert(root->left, newNode->intr);
             }
         }else{
             if(!root->right){
                 root->right = newNode;
                 newNode->parent = root;
             }else{
-                insert(root->right, newNode->lowInterval, newNode->highInterval);
+                insert(root->right, newNode->intr);
             }
         }
     }
