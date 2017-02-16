@@ -33,6 +33,7 @@ class IntervalTree{
         Node* newNode(Interval interval);
         void insert(Node* root, Interval interval);
         Node* deleteNode(Node* root, Interval interval);
+        Node* searchInterval(Node* root, Interval interval);
 };
 
 
@@ -105,7 +106,23 @@ Node* IntervalTree::deleteNode(Node* root, Interval interval){
     return root;
 }
 
+Node* IntervalTree::searchInterval(Node *root, Interval interval){
+        if (root == NULL){
+            return NULL;
+        }
+        if (root->intr.low <= interval.high && root->intr.high >= interval.low){
+            return root;
+        }
+        if (root->left != NULL && (root->left)->data >= interval.low){
+            return searchInterval(root->left, interval);
+        }
+        else{
+            return searchInterval(root->right, interval);
+        }
+    }
 
 
 int main(){
+
+
 }
