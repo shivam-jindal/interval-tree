@@ -32,6 +32,7 @@ class IntervalTree{
 
         Node* newNode(Interval interval);
         void insert(Node* root, Interval interval);
+        Node* deleteNode(Node* root, Interval interval);
 };
 
 
@@ -69,6 +70,40 @@ void IntervalTree::insert(Node* root, Interval interval){
     }
 }
 
+
+
+Node* IntervalTree::deleteNode(Node* root, Interval interval){
+    if (root == NULL)
+        return root;
+    if (interval.low < root->intr.low)
+        root->left = deleteNode(root->left, interval);
+    else if (interval.low > root->intr.low)
+        root->right = deleteNode(root->right, interval);
+    else{
+        Node *p = root->parent;
+        int maxleft = (root->left)->data;
+        int maxright = (root->right)->data;
+        if (root->left == NULL){
+            Node *temp = root->right;
+            p->data = max(p->data, temp->data);
+            return temp;
+        }
+        else if (root->right == NULL){
+            Node *temp = root->left;
+            p->data = max(p->data, temp->data);
+            return temp;
+        }
+        p->data = max(p->data, max((root->left)->data, (root->right)->data));
+        Node *temp = root->right;
+        while (temp->left != NULL)
+            temp = temp->left;
+
+        root->intr = temp->intr;
+        root->data =  max(maxleft, maxright);
+        root->right = deleteNode(root->right, temp->intr);
+    }
+    return root;
+}
 
 
 
